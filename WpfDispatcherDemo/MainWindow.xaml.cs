@@ -1,18 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace WpfDispatcherDemo
@@ -25,6 +13,21 @@ namespace WpfDispatcherDemo
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            // start not UI thread
+            Thread thread = new Thread(UpdateTextNonUiThread);
+            thread.Start();
+        }
+
+        private void UpdateTextNonUiThread()
+        {
+            // Try from non UI thread
+            var b = showDialog("Bla bla bla");
+            // dispatch TextBox update to UI thread
+            Dispatcher.Invoke(() => this.TextBox1.Text = b ? "YES ASDASD" : "NOOOOOOOOOOOOOOOOOO");
         }
 
         public bool showDialog(string text)
@@ -49,21 +52,6 @@ namespace WpfDispatcherDemo
             // were on UI Thread, show popup
             var r = MessageBox.Show(text, "Title", MessageBoxButton.YesNo);
             return r == MessageBoxResult.Yes;
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            // start not UI thread
-            Thread thread = new Thread(UpdateTextNonUiThread);
-            thread.Start();
-        }
-
-        private void UpdateTextNonUiThread()
-        { 
-            // Try from non UI thread
-            var b = showDialog("Bla bla bla");
-            // dispatch TextBox update to UI thread
-            Dispatcher.Invoke(() => this.TextBox1.Text = b ? "YES ASDASD" : "NOOOOOOOOOOOOOOOOOO");
         }
     }
 }
